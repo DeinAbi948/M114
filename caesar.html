@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>CAESAR</title>
+  <style>
+    body {
+      background-color: #FFFFE0; /* Yellowish tone */
+      font-family: Arial, sans-serif;
+    }
+    
+    .logo {
+      text-align: center;
+      font-family: "Little Caesar", Arial, sans-serif;
+      font-size: 32px;
+      font-weight: bold;
+      color: #8B4513; /* Brown color */
+    }
+    
+    .subtitle {
+      text-align: center;
+      font-size: 18px;
+      color: #8B4513; /* Brown color */
+    }
+    
+    .page {
+      max-width: 300px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: white;
+      border: 1px solid #8B4513; /* Brown color */
+    }
+    
+    label {
+      color: #8B4513; /* Brown color */
+    }
+    
+    input[type="text"], textarea {
+      width: 100%;
+      padding: 5px;
+      margin-bottom: 10px;
+      border: 1px solid #8B4513; /* Brown color */
+    }
+    
+    button {
+      background-color: #8B4513; /* Brown color */
+      color: white;
+      border: none;
+      padding: 10px;
+      cursor: pointer;
+      width: 100%;
+    }
+    
+    .output {
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1 class="logo">CAESAR</h1>
+  <h2 class="subtitle">Encryption/Decryption Program</h2>
+  <div class="page">
+    <button onclick="toggleEncryptPage()">Encrypt</button>
+    <button onclick="toggleDecryptPage()">Decrypt</button>
+    
+    <div id="encrypt-page" style="display: none;">
+      <h3>Encrypt</h3>
+      <label for="encrypt-text">Enter the text to encrypt:</label>
+      <textarea id="encrypt-text"></textarea>
+      <button onclick="encryptText()">Encrypt</button>
+      <div class="output">
+        <label for="encrypted-text">Encrypted Text:</label>
+        <textarea id="encrypted-text" readonly></textarea>
+      </div>
+    </div>
+    
+    <div id="decrypt-page" style="display: none;">
+      <h3>Decrypt</h3>
+      <label for="decrypt-text">Enter the encrypted text:</label>
+      <textarea id="decrypt-text"></textarea>
+      <button onclick="decryptText()">Decrypt</button>
+      <div class="output">
+        <label for="decrypted-text">Decrypted Text:</label>
+        <textarea id="decrypted-text" readonly></textarea>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function toggleEncryptPage() {
+      document.getElementById("encrypt-page").style.display = "block";
+      document.getElementById("decrypt-page").style.display = "none";
+    }
+    
+    function toggleDecryptPage() {
+      document.getElementById("decrypt-page").style.display = "block";
+      document.getElementById("encrypt-page").style.display = "none";
+    }
+    
+    function encryptText() {
+      var inputText = document.getElementById("encrypt-text").value;
+      var key = 3; // Shift key
+      var encryptedText = caesarEncrypt(inputText, key);
+      document.getElementById("encrypted-text").value = encryptedText;
+    }
+    
+    function decryptText() {
+      var inputText = document.getElementById("decrypt-text").value;
+      var key = 3; // Shift key
+      var decryptedText = caesarDecrypt(inputText, key);
+      document.getElementById("decrypted-text").value = decryptedText;
+    }
+    
+    function caesarEncrypt(text, key) {
+      var encryptedText = "";
+      for (var i = 0; i < text.length; i++) {
+        var char = text[i];
+        if (char.match(/[a-z]/i)) {
+          var asciiOffset = char.toUpperCase() === char ? 65 : 97;
+          var encryptedChar = String.fromCharCode(((char.charCodeAt(0) - asciiOffset + key) % 26) + asciiOffset);
+          encryptedText += encryptedChar;
+        } else {
+          encryptedText += char;
+        }
+      }
+      return encryptedText;
+    }
+    
+    function caesarDecrypt(text, key) {
+      var decryptedText = "";
+      for (var i = 0; i < text.length; i++) {
+        var char = text[i];
+        if (char.match(/[a-z]/i)) {
+          var asciiOffset = char.toUpperCase() === char ? 65 : 97;
+          var decryptedChar = String.fromCharCode(((char.charCodeAt(0) - asciiOffset - key + 26) % 26) + asciiOffset);
+          decryptedText += decryptedChar;
+        } else {
+          decryptedText += char;
+        }
+      }
+      return decryptedText;
+    }
+  </script>
+</body>
+</html>
