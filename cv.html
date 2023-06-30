@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>CAESAR & Vigenère</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #033500; /* Dark green background color */
+      color: #ffffff; /* White text color */
+    }
+
+    .logo {
+      text-align: center;
+      font-family: "Arial Black", sans-serif;
+      font-size: 36px;
+      margin-bottom: 10px;
+    }
+
+    .subtitle {
+      text-align: center;
+      font-size: 18px;
+      margin-bottom: 20px;
+    }
+
+    .button-group {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .button {
+      padding: 10px 20px;
+      font-size: 16px;
+      margin: 0 10px;
+      background-color: #D2B48C;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+
+    .button:hover {
+      background-color: #FA8072;
+    }
+
+    .input-label {
+      display: block;
+      font-size: 16px;
+      margin-bottom: 5px;
+    }
+
+    .input-field {
+      width: 100%;
+      padding: 8px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+      margin-bottom: 10px;
+    }
+
+    .output-label {
+      display: block;
+      font-size: 16px;
+      margin-bottom: 5px;
+      margin-top: 20px;
+    }
+
+    .output-field {
+      width: 100%;
+      padding: 8px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+
+    .output-field[readonly] {
+      background-color: #f8f8f8;
+      color: #333;
+      cursor: not-allowed;
+    }
+
+    .mode-button {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background-color: #333;
+      color: #fff;
+      padding: 6px 12px;
+      font-size: 14px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .light-mode {
+      background-color: #f8f8f8;
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+  <h1 class="logo">CAESAR & Vigenère</h1>
+  <h2 class="subtitle">Encryption/Decryption Program</h2>
+  <button id="mode-toggle" class="mode-button" onclick="toggleMode()">Dark Mode</button>
+  <div class="button-group">
+    <button class="button" onclick="toggleEncryptPage()">Caesar Encrypt</button>
+    <button class="button" onclick="toggleDecryptPage()">Caesar Decrypt</button>
+    <button class="button" onclick="toggleEncryptPageV()">Vigenère Encrypt</button>
+    <button class="button" onclick="toggleDecryptPageV()">Vigenère Decrypt</button>
+  </div>
+
+  <div id="encrypt-page" style="display: none;">
+    <h3>Caesar Encrypt</h3>
+    <label class="input-label" for="caesar-encrypt-input">Plain Text:</label>
+    <input id="caesar-encrypt-input" class="input-field" type="text">
+    <label class="input-label" for="caesar-encrypt-shift">Shift:</label>
+    <input id="caesar-encrypt-shift" class="input-field" type="number">
+    <button class="button" onclick="encryptCaesar()">Encrypt</button>
+    <label class="output-label" for="caesar-encrypt-output">Cipher Text:</label>
+    <input id="caesar-encrypt-output" class="output-field" type="text" readonly>
+  </div>
+
+  <div id="decrypt-page" style="display: none;">
+    <h3>Caesar Decrypt</h3>
+    <label class="input-label" for="caesar-decrypt-input">Cipher Text:</label>
+    <input id="caesar-decrypt-input" class="input-field" type="text">
+    <label class="input-label" for="caesar-decrypt-shift">Shift:</label>
+    <input id="caesar-decrypt-shift" class="input-field" type="number">
+    <button class="button" onclick="decryptCaesar()">Decrypt</button>
+    <label class="output-label" for="caesar-decrypt-output">Plain Text:</label>
+    <input id="caesar-decrypt-output" class="output-field" type="text" readonly>
+  </div>
+
+  <div id="encrypt-page-v" style="display: none;">
+    <h3>Vigenère Encrypt</h3>
+    <label class="input-label" for="vigenere-encrypt-input">Plain Text:</label>
+    <input id="vigenere-encrypt-input" class="input-field" type="text">
+    <label class="input-label" for="vigenere-encrypt-key">Key:</label>
+    <input id="vigenere-encrypt-key" class="input-field" type="text">
+    <button class="button" onclick="encryptVigenere()">Encrypt</button>
+    <label class="output-label" for="vigenere-encrypt-output">Cipher Text:</label>
+    <input id="vigenere-encrypt-output" class="output-field" type="text" readonly>
+  </div>
+
+  <div id="decrypt-page-v" style="display: none;">
+    <h3>Vigenère Decrypt</h3>
+    <label class="input-label" for="vigenere-decrypt-input">Cipher Text:</label>
+    <input id="vigenere-decrypt-input" class="input-field" type="text">
+    <label class="input-label" for="vigenere-decrypt-key">Key:</label>
+    <input id="vigenere-decrypt-key" class="input-field" type="text">
+    <button class="button" onclick="decryptVigenere()">Decrypt</button>
+    <label class="output-label" for="vigenere-decrypt-output">Plain Text:</label>
+    <input id="vigenere-decrypt-output" class="output-field" type="text" readonly>
+  </div>
+
+  <script>
+    let darkMode = false;
+
+    function toggleMode() {
+      const body = document.body;
+      const modeToggle = document.getElementById("mode-toggle");
+
+      darkMode = !darkMode;
+      if (darkMode) {
+        body.style.backgroundColor = "#033500"; /* Dark green background color */
+        body.style.color = "#ffffff"; /* White text color */
+        modeToggle.innerHTML = "Light Mode";
+        modeToggle.classList.add("light-mode");
+      } else {
+        body.style.backgroundColor = "#f8f8f8"; /* Light gray background color */
+        body.style.color = "#333"; /* Dark gray text color */
+        modeToggle.innerHTML = "Dark Mode";
+        modeToggle.classList.remove("light-mode");
+      }
+    }
+
+    function toggleEncryptPage() {
+      document.getElementById("encrypt-page").style.display = "block";
+      document.getElementById("decrypt-page").style.display = "none";
+      document.getElementById("encrypt-page-v").style.display = "none";
+      document.getElementById("decrypt-page-v").style.display = "none";
+    }
+
+    function toggleDecryptPage() {
+      document.getElementById("encrypt-page").style.display = "none";
+      document.getElementById("decrypt-page").style.display = "block";
+      document.getElementById("encrypt-page-v").style.display = "none";
+      document.getElementById("decrypt-page-v").style.display = "none";
+    }
+
+    function toggleEncryptPageV() {
+      document.getElementById("encrypt-page").style.display = "none";
+      document.getElementById("decrypt-page").style.display = "none";
+      document.getElementById("encrypt-page-v").style.display = "block";
+      document.getElementById("decrypt-page-v").style.display = "none";
+    }
+
+    function toggleDecryptPageV() {
+      document.getElementById("encrypt-page").style.display = "none";
+      document.getElementById("decrypt-page").style.display = "none";
+      document.getElementById("encrypt-page-v").style.display = "none";
+      document.getElementById("decrypt-page-v").style.display = "block";
+    }
+
+    function encryptCaesar() {
+      const plaintext = document.getElementById("caesar-encrypt-input").value;
+      const shift = parseInt(document.getElementById("caesar-encrypt-shift").value);
+      const ciphertext = caesarEncrypt(plaintext, shift);
+      document.getElementById("caesar-encrypt-output").value = ciphertext;
+    }
+
+    function decryptCaesar() {
+      const ciphertext = document.getElementById("caesar-decrypt-input").value;
+      const shift = parseInt(document.getElementById("caesar-decrypt-shift").value);
+      const plaintext = caesarDecrypt(ciphertext, shift);
+      document.getElementById("caesar-decrypt-output").value = plaintext;
+    }
+
+    function encryptVigenere() {
+      const plaintext = document.getElementById("vigenere-encrypt-input").value;
+      const key = document.getElementById("vigenere-encrypt-key").value;
+      const ciphertext = vigenereEncrypt(plaintext, key);
+      document.getElementById("vigenere-encrypt-output").value = ciphertext;
+    }
+
+    function decryptVigenere() {
+      const ciphertext = document.getElementById("vigenere-decrypt-input").value;
+      const key = document.getElementById("vigenere-decrypt-key").value;
+      const plaintext = vigenereDecrypt(ciphertext, key);
+      document.getElementById("vigenere-decrypt-output").value = plaintext;
+    }
+
+    function caesarEncrypt(plaintext, shift) {
+      let ciphertext = "";
+      for (let i = 0; i < plaintext.length; i++) {
+        const charCode = plaintext.charCodeAt(i);
+        if (charCode >= 65 && charCode <= 90) {
+          // Uppercase letters
+          ciphertext += String.fromCharCode(((charCode - 65 + shift) % 26) + 65);
+        } else if (charCode >= 97 && charCode <= 122) {
+          // Lowercase letters
+          ciphertext += String.fromCharCode(((charCode - 97 + shift) % 26) + 97);
+        } else {
+          ciphertext += plaintext.charAt(i);
+        }
+      }
+      return ciphertext;
+    }
+
+    function caesarDecrypt(ciphertext, shift) {
+      let plaintext = "";
+      for (let i = 0; i < ciphertext.length; i++) {
+        const charCode = ciphertext.charCodeAt(i);
+        if (charCode >= 65 && charCode <= 90) {
+          // Uppercase letters
+          plaintext += String.fromCharCode(((charCode - 65 - shift + 26) % 26) + 65);
+        } else if (charCode >= 97 && charCode <= 122) {
+          // Lowercase letters
+          plaintext += String.fromCharCode(((charCode - 97 - shift + 26) % 26) + 97);
+        } else {
+          plaintext += ciphertext.charAt(i);
+        }
+      }
+      return plaintext;
+    }
+
+    function vigenereEncrypt(plaintext, key) {
+      let ciphertext = "";
+      const keyLength = key.length;
+      for (let i = 0; i < plaintext.length; i++) {
+        const charCode = plaintext.charCodeAt(i);
+        const keyCharCode = key.charCodeAt(i % keyLength);
+        if (charCode >= 65 && charCode <= 90) {
+          // Uppercase letters
+          const encryptedCharCode = ((charCode - 65 + keyCharCode - 65) % 26) + 65;
+          ciphertext += String.fromCharCode(encryptedCharCode);
+        } else if (charCode >= 97 && charCode <= 122) {
+          // Lowercase letters
+          const encryptedCharCode = ((charCode - 97 + keyCharCode - 97) % 26) + 97;
+          ciphertext += String.fromCharCode(encryptedCharCode);
+        } else {
+          ciphertext += plaintext.charAt(i);
+        }
+      }
+      return ciphertext;
+    }
+
+    function vigenereDecrypt(ciphertext, key) {
+      let plaintext = "";
+      const keyLength = key.length;
+      for (let i = 0; i < ciphertext.length; i++) {
+        const charCode = ciphertext.charCodeAt(i);
+        const keyCharCode = key.charCodeAt(i % keyLength);
+        if (charCode >= 65 && charCode <= 90) {
+          // Uppercase letters
+          const decryptedCharCode = ((charCode - 65 - (keyCharCode - 65) + 26) % 26) + 65;
+          plaintext += String.fromCharCode(decryptedCharCode);
+        } else if (charCode >= 97 && charCode <= 122) {
+          // Lowercase letters
+          const decryptedCharCode = ((charCode - 97 - (keyCharCode - 97) + 26) % 26) + 97;
+          plaintext += String.fromCharCode(decryptedCharCode);
+        } else {
+          plaintext += ciphertext.charAt(i);
+        }
+      }
+      return plaintext;
+    }
+  </script>
+</body>
+</html>
