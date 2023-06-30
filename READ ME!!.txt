@@ -45,3 +45,5 @@ Vigenère Decrypt (Vigenère-Entschlüsselung)
     Das Ergebnis wird im "Plain Text" (Klartext)-Feld angezeigt.
 
 Dieser Code kann als Ausgangspunkt für Ihre eigenen Verschlüsselungs-/Entschlüsselungsprojekte oder als Lernressource zur Implementierung der Caesar- und Vigenère-Verschlüsselung in JavaScript verwendet werden.
+
+Autoren: Markus, Ali, David (MAD)
